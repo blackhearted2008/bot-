@@ -1,3 +1,40 @@
+const express = require('express');
+const axios = require('axios');
+const app = express();
+const port = process.env.PORT || 3000;
+
+const proxies = [
+    { host: '103.7.26.142', port: 8080 },
+    { host: '103.7.26.142', port: 8080 },
+    { host: '103.7.26.142', port: 8080 }
+];
+
+function getRandomProxy() {
+    const randomIndex = Math.floor(Math.random() * proxies.length);
+    return proxies[randomIndex];
+}
+
+app.get('/', async (req, res) => {
+    const url = req.query.url || 'https://example.com';
+    const proxy = getRandomProxy();
+
+    try {
+        const response = await axios.get(url, {
+            proxy: {
+                host: proxy.host,
+                port: proxy.port
+            }
+        });
+        res.send(`Status: ${response.status}`);
+    } catch (error) {
+        res.send(`Error: Unable to access ${url}`);
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
+
 my-bot/
 ├── index.js
 ├── package.json
